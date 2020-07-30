@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace StarCraft
 {
-    class Unit: IUnit
+    class Unit
     {
         // 유닛 하나당 하나의 이미지를 담을 PictureBox
         public PictureBox picture = new PictureBox();

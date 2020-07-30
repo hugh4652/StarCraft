@@ -8,5 +8,9 @@ namespace StarCraft
 {
     interface IUnit
     {
+        void SetDestination();
+        void Move();
+        void update();
+        void ImageUpdate();
     }
 }

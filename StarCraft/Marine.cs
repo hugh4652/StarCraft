@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StarCraft
 {
-    class Marine
+    class Marine: Unit
     {
     }
 }
