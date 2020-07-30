@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace StarCraft
 {
-    public partial class Form1 : Form
+    public partial class MainScreen : Form
     {
         private LinkedList<Unit> unit_list = new LinkedList<Unit>();
 
-        public Form1()
+        public MainScreen()
         {
             InitializeComponent();
         }
@@ -23,8 +23,20 @@ namespace StarCraft
         {
             Unit marine = new Marine(this, 0, 0);
             unit_list.AddLast(marine);
+           
         }
 
+        private void MainScreen_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                foreach (Unit unit in unit_list)
+                {
+                    unit.selected = true;
+                    unit.SetDestination(e.Location);
+                }
+            }
+        }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -33,5 +45,6 @@ namespace StarCraft
                 unit.update();
             }
         }
+
     }
 }

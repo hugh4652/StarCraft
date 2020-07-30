@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,15 +20,15 @@ namespace StarCraft
         protected Condition next_state;
 
         // 유닛의 위치와, 이동할 위치
-        protected bool selected;
+        public bool selected;
         protected Point p = new Point(0, 0);
         protected Point d = new Point(0, 0);
 
 
         // 유닛의 스텟들
         protected int health;
-        protected int max_health;
-        protected int speed;
+        protected static int max_health;
+        protected static int speed;
 
 
         // 이미지 관련 변수
@@ -35,27 +36,22 @@ namespace StarCraft
         protected static int sprite_height;
         protected static int sprite_row;
         protected static int sprite_col;
-        protected static List<List<Bitmap>> animation_sprites = new List<List<Bitmap>>();
+        protected List<List<Bitmap>> animation_sprites = new List<List<Bitmap>>();
 
         // 애니메이션 관련 변수
         protected int time_index;
         protected int rot_index;
 
-        public Unit()
-        {
-            state = Condition.STATE_IDLE;
-            next_state = Condition.STATE_IDLE;
 
-        }
-
-        public void SetDestination(Point p)
+        public void SetDestination(Point point)
         {
+            Console.WriteLine($"{this}의 목표 좌표: {p}");
             next_state = Condition.STATE_MOVE;
-            d.X = p.X;
-            d.Y = p.Y;
+            d.X = point.X;
+            d.Y = point.Y;
         }
 
-        public void Move()
+        public virtual void Move()
         {
             if(state != Condition.STATE_MOVE)
             {
@@ -76,7 +72,6 @@ namespace StarCraft
                 next_state = Condition.STATE_IDLE;
             }
 
-
             rot_index = (int)((theta + Math.PI / 2 + Math.PI / sprite_row) / (Math.PI / (sprite_row / 2)) + sprite_row);
             rot_index %= sprite_row;
 
@@ -86,23 +81,24 @@ namespace StarCraft
 
         public void ImageUpdate()
         {
+            Debug();
             if (state == Condition.STATE_MOVE)
             {
                 picture.Left = (int)p.X;
                 picture.Top = (int)p.Y;
-                picture.Image = (Image)animation_sprites[(time_index / 3) % 9 + 4][rot_index];
+                picture.Image = (Sprite)animation_sprites[(time_index / 3) % 9 + 4][rot_index];
             }
             else if (state == Condition.STATE_ATTK)
             {
-                picture.Image = (Image)animation_sprites[(time_index / 10) % 2 + 2][rot_index];
+                picture.Image = (Sprite)animation_sprites[(time_index / 10) % 2 + 2][rot_index];
             }
             else if (state == Condition.STATE_IDLE)
             {
-                picture.Image = (Image)animation_sprites[(time_index / 30) % 2][rot_index];
+                picture.Image = (Sprite)animation_sprites[(time_index / 30) % 2][rot_index];
             }
             else if (state == Condition.STATE_DEAD)
             {
-                picture.Image = (Image)animation_sprites[13][time_index / 5];
+                picture.Image = (Sprite)animation_sprites[13][time_index / 5];
             }
             else
             {
@@ -114,11 +110,11 @@ namespace StarCraft
 
         public void update()
         {
+            //Debug();
             if (!selected)
             {
                 return;
             }
-
             Move();
             ImageUpdate();
 
@@ -127,7 +123,17 @@ namespace StarCraft
             time_index += 1;
         }
 
-
+        public void Debug()
+        {
+            Console.WriteLine($"{this}의 상태");
+            Console.WriteLine($"{this} 선택 됨: {selected}");
+            Console.WriteLine($"{this}의 현재 좌표: {p}");
+            Console.WriteLine($"{this}의 목표 좌표: {d}");
+            Console.WriteLine($"{this}의 PictureBox 좌표: {picture.Location}");
+            Console.WriteLine($"{this}의 time_index 값: {time_index}");
+            Console.WriteLine($"{this}의 rot_index 값: {rot_index}");
+            Console.WriteLine($"{this}의 sprite_row 값: {sprite_row}");
+        }
 
         ~Unit()
         {

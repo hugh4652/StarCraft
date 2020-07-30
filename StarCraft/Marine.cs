@@ -24,21 +24,21 @@ namespace StarCraft
         private new static int sprite_height;
         private new static int sprite_row;
         private new static int sprite_col;
-        private new static List<List<Bitmap>> animation_sprites = new List<List<Bitmap>>();
+        public new static List<List<Bitmap>> animation_sprites = new List<List<Bitmap>>();
 
 
         static Marine()
         {
-            Marine.max_health = 5;
-            Marine.sprite_row = 32;
-            Marine.sprite_col = 14;
-            Marine.sprite_width = 64;
-            Marine.sprite_height = 64;
+            max_health = 5;
+            sprite_row = 32;
+            sprite_col = 14;
+            sprite_width = 64;
+            sprite_height = 64;
 
-            Marine.speed = 5;
+            speed = 2;
 
-            Bitmap sprite_sheet_R = Image.FromFile("..\\..\\contents\\Marine\\Marine_R.gif") as Bitmap;
-            Bitmap sprite_sheet_L = Image.FromFile("..\\..\\contents\\Marine\\Marine_L.gif") as Bitmap;
+            Bitmap sprite_sheet_R = Sprite.FromFile("..\\..\\contents\\Marine\\Marine_R.gif") as Bitmap;
+            Bitmap sprite_sheet_L = Sprite.FromFile("..\\..\\contents\\Marine\\Marine_L.gif") as Bitmap;
 
             // animation_sprite 초기화
             for (int j = 0; j < sprite_col; j++)
@@ -64,8 +64,11 @@ namespace StarCraft
             }
         }
 
+
         public Marine(Form form, int x = 0, int y = 0)
         {
+            form.Controls.Add(this.picture);
+
             p.X = x;
             p.Y = y;
 
@@ -78,16 +81,42 @@ namespace StarCraft
             state = Condition.STATE_IDLE;
             next_state = Condition.STATE_IDLE;
 
-            form.Controls.Add(picture);
-
             picture.Left = p.X;
             picture.Top = p.Y;
             picture.SizeMode = PictureBoxSizeMode.AutoSize;
 
-            picture.Image = (Image)animation_sprites[0][0];
+            picture.Image = (Sprite)animation_sprites[0][0];
 
             time_index = 0;
             rot_index = 0;
+        }
+
+        public override void Move()
+        {
+            if (state != Condition.STATE_MOVE)
+            {
+                return;
+            }
+
+            double dx = d.X - p.X;
+            double dy = d.Y - p.Y;
+            double theta = Math.Atan2(dy, dx);
+
+            double move_length = speed;
+            double left_length = Math.Sqrt(dx * dx + dy * dy);
+
+            if (left_length < move_length)
+            {
+                time_index = 0;
+                move_length = left_length;
+                next_state = Condition.STATE_IDLE;
+            }
+
+            rot_index = (int)((theta + Math.PI / 2 + Math.PI / sprite_row) / (Math.PI / (sprite_row / 2)) + sprite_row);
+            rot_index %= sprite_row;
+
+            p.X += (int)(move_length * Math.Cos(theta));
+            p.Y += (int)(move_length * Math.Sin(theta));
         }
 
     }
